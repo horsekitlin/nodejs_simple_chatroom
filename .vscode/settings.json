@@ -1,0 +1,9 @@
+// 將您的設定放入此檔案中以覆寫預設值和使用者設定。
+{
+    "editor.lineHeight": 18,
+    "editor.fontSize": 16,
+    "editor.renderWhitespace": "boundary",
+    "editor.renderndentGuides": true,
+    "react.eautify.onSave": true,
+    "path-intllisense.extensionOnImport": true,
+}

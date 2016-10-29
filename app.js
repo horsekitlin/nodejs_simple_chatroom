@@ -1,6 +1,10 @@
-var app = require('express')();
-var http = require('http').Server(app);
-var io = require('socket.io')(http);
+import Express from 'express';
+import httpModule from 'http';
+import socketIO from 'socket.io';
+
+const app = Express();
+const http = httpModule.Server(app);
+const io = socketIO(http);
 
 app.get('/', function(req, res){
 	res.sendFile(__dirname + '/index.html');
