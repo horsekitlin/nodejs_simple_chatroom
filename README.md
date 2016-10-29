@@ -1,1 +1,4 @@
-simple chatroom using socket.io and node.js
+# SocketIO
+
+Extends From [github](https://github.com/aszx87410/nodejs_simple_chatroom)
+
