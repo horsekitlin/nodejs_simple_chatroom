@@ -55,7 +55,8 @@
     <script>
 
 
-var roomId = '';
+      var roomId = '',
+          uid = '';
 
       var socket = io('http://localhost:3000');
       $(document).ready(function(){
@@ -74,6 +75,15 @@ var roomId = '';
             roomId: roomId
           });
         }, 1000);
+        //發送區域性訊息
+        setTimeout(function(){
+          socket.emit('localmessage', {
+            roomId: roomId,
+            params: {
+              message: '這是區域訊息'
+            },
+          });
+        }, 1200);
 
         //離開房間
         setTimeout(function(){
@@ -93,6 +103,16 @@ var roomId = '';
           appendMessage(resp.message);
         });
 
+        socket.on('localmessage', function(data){
+          appendMessage('LocalMessage:' + JSON.stringify(data));
+        });
+
+        socket.on('getuid', function(data){
+          if(data.uid !== undefined){
+            uid = data.uid;
+            appendMessage("UID: " + data.uid);
+          }
+        });
         socket.on('chat message', function(data){
           appendMessage(data.username+":"+data.msg);
         });

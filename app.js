@@ -85,6 +85,11 @@ var user_count = 0;
 
 //當新的使用者連接進來的時候
 io.on('connection', function(socket){
+	
+	//回傳個人的socket.id
+	socket.emit('getuid', {
+		uid: socket.id
+	});
 
 	// TODO 建立房間
 	socket.on('createroom', (data) => {
@@ -145,6 +150,16 @@ io.on('connection', function(socket){
 	});
 	// TODO 發送房間訊息
 
+	socket.on('localmessage', (req) => {
+		
+		const checkResult = checkRoomId(rooms, req.roomId);
+		
+		if(checkResult.error){
+			socket.emit('errorStatus', checkResult.error);
+		}else{
+			io.to(req.roomId).emit('localmessage', req.params);
+		}
+	});
 	// TODO 發送私密訊息
 
 	//新user
