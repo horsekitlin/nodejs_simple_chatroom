@@ -13,6 +13,16 @@ app.get('/', function(req, res){
 	res.sendFile(__dirname + '/index.html');
 });
 
+function DisconnectRoom(rooms: Array, socket: Object){
+	const roomId = socket.id;
+
+	let targetRoom = _.find(rooms, (room) => {
+		return room.id === roomId;
+	});
+	console.log(targetRoom.id);
+	socket.leave(targetRoom.id);
+}
+
 function checkRoomId(rooms: Array, roomId: string){
 	let checkReq = _.isUndefined(roomId) || _.isEmpty(roomId),
 		resp = {
@@ -160,31 +170,10 @@ io.on('connection', function(socket){
 			io.to(req.roomId).emit('localmessage', req.params);
 		}
 	});
-	// TODO 發送私密訊息
-
-	//新user
-	socket.on('add user',function(msg){
-		socket.username = msg;
-		console.log("new user:"+msg+" logged.");
-		io.emit('add user',{
-			username: socket.username
-		});
-	});
-
-	//監聽新訊息事件
-	socket.on('chat message', function(msg){
-
-		console.log(socket.username+":"+msg);
-
-  		//發佈新訊息
-		io.emit('chat message', {
-			username:socket.username,
-			msg:msg
-		});
-	});
 
 	//left
 	socket.on('disconnect',function(){
+		DisconnectRoom(rooms, socket.id);
 		io.emit('user left',{
 			username:socket.username
 		});
