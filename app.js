@@ -19,7 +19,6 @@ function DisconnectRoom(rooms: Array, socket: Object){
 	let targetRoom = _.find(rooms, (room) => {
 		return room.id === roomId;
 	});
-	console.log(targetRoom.id);
 	socket.leave(targetRoom.id);
 }
 
@@ -171,6 +170,12 @@ io.on('connection', function(socket){
 		}
 	});
 
+	// TODO 發送全域訊息
+
+	socket.on('globalmessage', (req) => {
+		io.emit('globalmessage', req.params);
+	});
+	
 	//left
 	socket.on('disconnect',function(){
 		DisconnectRoom(rooms, socket.id);

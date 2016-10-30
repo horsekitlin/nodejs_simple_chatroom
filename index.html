@@ -75,6 +75,7 @@
             roomId: roomId
           });
         }, 1000);
+
         //發送區域性訊息
         setTimeout(function(){
           socket.emit('localmessage', {
@@ -84,6 +85,16 @@
             },
           });
         }, 1200);
+
+        //發送區域性訊息
+        setTimeout(function(){
+          socket.emit('globalmessage', {
+            roomId: roomId,
+            params: {
+              message: '這是全域訊息'
+            },
+          });
+        }, 1400);
 
         //離開房間
         setTimeout(function(){
@@ -105,6 +116,10 @@
 
         socket.on('localmessage', function(data){
           appendMessage('LocalMessage:' + JSON.stringify(data));
+        });
+
+        socket.on('globalmessage', function(data){
+          appendMessage('GlobalMessage:' + JSON.stringify(data));
         });
 
         socket.on('getuid', function(data){
