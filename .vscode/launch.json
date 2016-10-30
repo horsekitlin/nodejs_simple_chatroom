@@ -5,10 +5,12 @@
             "name": "啟動",
             "type": "node",
             "request": "launch",
-            "program": "${workspaceRoot}/node_modules/babel-cli/bin/babel-node.js",
+            "program": "${workspaceRoot}/node_modules/nodemon/bin/nodemon.js",
             "stopOnEntry": false,
             "args": [
                 "${workspaceRoot}/app.js"
+                "--exec",
+                "babel-node",
             ],
             "cwd": "${workspaceRoot}",
             "preLaunchTask": null,

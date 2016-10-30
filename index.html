@@ -56,7 +56,7 @@
 
 
 
-      var socket = io('http://45.33.73.179:3000');
+      var socket = io('http://localhost:3000');
       $(document).ready(function(){
 
         var name = prompt("請輸入暱稱","guest");
@@ -65,10 +65,19 @@
           name = "guest";
         }
 
+        socket.emit('createroom', {});
+
+        socket.on('success', function(resp){
+          appendMessage(resp.message);
+        });
         //tell server
         socket.emit("add user",name);
 
         //監聽新訊息事件
+        socket.on('success', function(data){
+          console.log(data);
+        });
+
         socket.on('chat message', function(data){
           appendMessage(data.username+":"+data.msg);
         });
