@@ -70,10 +70,17 @@ var roomId = '';
 
         //加入房間
         setTimeout(function(){
-          socket.emit('adduser', {
+          socket.emit('joinroom', {
             roomId: roomId
           });
         }, 1000);
+
+        //離開房間
+        setTimeout(function(){
+          socket.emit('leaveroom', {
+            roomId: roomId
+          });
+        }, 2000);
 
         //tell server
         socket.emit("add user",name);

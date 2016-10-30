@@ -13,6 +13,35 @@ app.get('/', function(req, res){
 	res.sendFile(__dirname + '/index.html');
 });
 
+function checkRoomId(rooms: Array, roomId: string){
+	let checkReq = _.isUndefined(roomId) || _.isEmpty(roomId),
+		resp = {
+			error: null,
+			success: false
+		};
+
+	let targetRoom = _.find(rooms, (room) => {
+		return room.id === roomId;
+	});
+
+	if(checkReq){
+		resp.error = {
+			status: 404,
+			message : 'roomId 不可為空'
+		};
+	}else if(_.isUndefined(targetRoom)){
+		resp.error = {
+			status: 404,
+			message: '房間不存在'
+		};
+	}else{
+		resp.success = true;
+		resp.targetRoom = targetRoom;
+	}
+
+	return resp;
+}
+
 class roomClass{
 	constructor(params: object){
 
@@ -37,6 +66,14 @@ class roomClass{
 			this._MEMBERS.push(user);
 
 			resolve();
+		});
+	}
+
+	removeMember(user){
+		let error = null;
+		
+		return _.remove(this._MEMBERS, (member) => {
+			return member.id === user.id;
 		});
 	}
 }
@@ -66,29 +103,17 @@ io.on('connection', function(socket){
 	});
 
 	// TODO 加入房間
-	socket.on('adduser', (req) => {
-		const checkReq = _.isUndefined(req.roomId) || _.isEmpty(req.roomId);
-
-		let targetRoom = _.find(rooms, (room) => {
-			return room.id === req.roomId;
-		});
-
-console.log(checkReq);
-		if(checkReq){
-			socket.emit('errorStatus', {
-				status: 404,
-				message : 'roomId 不可為空'
-			});
-		}else if(_.isUndefined(targetRoom)){
-			socket.emit('errorStatus', {
-				status: 404,
-				message: '房間不存在'
-			});
+	socket.on('joinroom', (req) => {
+		const checkResult = checkRoomId(rooms, req.roomId);
+		
+		if(checkResult.error){
+			socket.emit('errorStatus', checkResult.error);
 		}else{
 
-				console.log(socket.id);
-			targetRoom.addMember(socket)
+			checkResult.targetRoom.addMember(socket)
 			.then(() => {
+				socket.join(req.roomId);
+
 				socket.emit('success', {
 					status: 200,
 					message: `使用者${socket.id}已加入成功`
@@ -103,7 +128,21 @@ console.log(checkReq);
 	});
 
 	// TODO 離開房間
-
+	socket.on('leaveroom', (req) => {
+		
+		const checkResult = checkRoomId(rooms, req.roomId);
+		
+		if(checkResult.error){
+			socket.emit('errorStatus', checkResult.error);
+		}else{
+			checkResult.targetRoom.removeMember(socket);
+			socket.leave(req.roomId);
+			socket.emit('success', {
+				status: 200,
+				message: `${socket.id}已經離開房間`
+			});
+		}
+	});
 	// TODO 發送房間訊息
 
 	// TODO 發送私密訊息
@@ -131,7 +170,6 @@ console.log(checkReq);
 
 	//left
 	socket.on('disconnect',function(){
-		console.log(socket.username+" left.");
 		io.emit('user left',{
 			username:socket.username
 		});
