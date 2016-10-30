@@ -1,5 +1,7 @@
 # SocketIO
 
+Demo Server: http://45.33.73.179:3000
+
 Extends From [github](https://github.com/aszx87410/nodejs_simple_chatroom)
 
 ## Routes
@@ -43,5 +45,5 @@ Extends From [github](https://github.com/aszx87410/nodejs_simple_chatroom)
     params:
 
         - params: Object 想要廣播的參數
-        
+
 ### 發送私密訊息
