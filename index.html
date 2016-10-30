@@ -55,6 +55,7 @@
     <script>
 
 
+var roomId = '';
 
       var socket = io('http://localhost:3000');
       $(document).ready(function(){
@@ -67,15 +68,22 @@
 
         socket.emit('createroom', {});
 
-        socket.on('success', function(resp){
-          appendMessage(resp.message);
-        });
+        //加入房間
+        setTimeout(function(){
+          socket.emit('adduser', {
+            roomId: roomId
+          });
+        }, 1000);
+
         //tell server
         socket.emit("add user",name);
 
         //監聽新訊息事件
-        socket.on('success', function(data){
-          console.log(data);
+        socket.on('success', function(resp){
+          if(resp.roomId){
+            roomId = resp.roomId;
+          }
+          appendMessage(resp.message);
         });
 
         socket.on('chat message', function(data){

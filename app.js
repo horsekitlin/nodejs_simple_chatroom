@@ -13,13 +13,17 @@ app.get('/', function(req, res){
 	res.sendFile(__dirname + '/index.html');
 });
 
-class roomClass extends Object{
+class roomClass{
 	constructor(params: object){
-		super(params);
+
 		this._MAX = 8;
 		this._ID = params.id;
 		this._MEMBERS = [];
 
+	}
+
+	get id(){
+		return this._ID;
 	}
 
 	addMember(user){
@@ -30,11 +34,10 @@ class roomClass extends Object{
 					reject(new Error('使用者已存在'));
 				}
 			});
+			this._MEMBERS.push(user);
+
+			resolve();
 		});
-
-		this._MEMBERS.push(user);
-
-		resolve();
 	}
 }
 
@@ -46,7 +49,6 @@ var user_count = 0;
 //當新的使用者連接進來的時候
 io.on('connection', function(socket){
 
-console.log(socket.id);
 	// TODO 建立房間
 	socket.on('createroom', (data) => {
 		const roomID = randomstring.generate();
@@ -58,7 +60,7 @@ console.log(socket.id);
 		rooms.push(room);
 		socket.emit('success', {
 			status: 200,
-			id: room.id,
+			roomId: room.id,
 			message: `建立房間${room.id}成功`
 		});
 	});
@@ -68,21 +70,23 @@ console.log(socket.id);
 		const checkReq = _.isUndefined(req.roomId) || _.isEmpty(req.roomId);
 
 		let targetRoom = _.find(rooms, (room) => {
-			return room.id === roomId;
+			return room.id === req.roomId;
 		});
 
+console.log(checkReq);
 		if(checkReq){
-			socket.emit('error', {
+			socket.emit('errorStatus', {
 				status: 404,
 				message : 'roomId 不可為空'
 			});
 		}else if(_.isUndefined(targetRoom)){
-			socket.emit('error', {
+			socket.emit('errorStatus', {
 				status: 404,
 				message: '房間不存在'
 			});
 		}else{
 
+				console.log(socket.id);
 			targetRoom.addMember(socket)
 			.then(() => {
 				socket.emit('success', {
